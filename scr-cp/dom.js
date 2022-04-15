@@ -56,7 +56,7 @@ window.dom ={
             return node.getAttribute(attName)
         }
     },
-    text(node,str){  //根据参数判断要读 还是要写
+    text(node,str){  //根据参数判断要读 还是要写 文本内容
         if(arguments.length === 2){
             if('innerText' in node){   //这种写法叫 适配  //电源适配器 根据不同的电压（110、220），转换成自己需要的
                 node.innerText = str  //IE
@@ -71,7 +71,7 @@ window.dom ={
             }
         }
     },
-    html(node,str){     //用于读写HTML内容
+    html(node,str){     //用于读、写HTML内容
         console.log(node)
         if(arguments.length === 2){
             node.innerHTML = str
@@ -79,8 +79,13 @@ window.dom ={
             return node.innerHTML
         }
     },
-    style(node,str){
-
+    style(node,obj){
+        for (let objKey in obj) {  //for...in...循环 对象
+            //key: border/ color/ background...
+            //node.style.border = ...
+            //node.style.color = ...
+            node.style[objKey] = obj[objKey]
+        }
     }
 }
 /*
