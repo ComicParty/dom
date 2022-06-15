@@ -24,10 +24,9 @@ window.dom ={
     },
     //给一个节点加父节点
     wrap(node,parent){
-        dom.before(parent,node)
-        dom.append(parent,node)
+        dom.before(parent,node)//把父节点放在 existingNode的前面
+        dom.append(parent,node)//父节点 使用 appendChild 把existingNode放进 父节点里面。
     },
-
     /* 删 */
     //删除当前节点 remove()比较新，IE可能不支持，使用removeChild()删除
     remove(node){
@@ -36,7 +35,7 @@ window.dom ={
     },
     //用于删除 节点的所有儿子
     empty(node){
-        // node.innerHTML = ''  //删除之后，就没法使用 要删除的节点了
+        // node.innerHTML = ''  //直接干掉
         const {childNodes} = node   //ES6语法
         //const childNodes = node.childNodes
         const arr = []
@@ -49,11 +48,11 @@ window.dom ={
         return arr
     },
     // 改
-    attr(node,attName,attValue){ //（节点，属性名，属性值） 重载：根据参数不同的数量写代码叫 重载
-        if (arguments.length === 3){
-            node.setAttribute(attName,attValue)
+    attr(existingNode,attrName,attrValue){//（节点，属性名，属性值） 重载：根据参数不同的数量写代码叫 重载
+        if (arguments.length ===3 ){
+            existingNode.setAttribute(attrName,attrValue)
         }else if(arguments.length === 2){
-            return node.getAttribute(attName)
+            return existingNode.getAttribute(attrName)
         }
     },
     text(node,str){  //根据参数判断要读 还是要写 文本内容
@@ -70,7 +69,7 @@ window.dom ={
                 return node.textContent
             }
         }
-    },
+    }, //重载-适用 接受的参数；适配-用于目标对象 如浏览器等等；两种不同的对象，两个的本质是一样的
     html(node,str){     //用于读、写HTML内容
         console.log(node)
         if(arguments.length === 2){
@@ -79,17 +78,91 @@ window.dom ={
             return node.innerHTML
         }
     },
-    style(node,obj){
-        for (let objKey in obj) {  //for...in...循环 对象
-            //key: border/ color/ background...
-            //node.style.border = ...
-            //node.style.color = ...
-            node.style[objKey] = obj[objKey]
+    style(node,name,value){
+        // for (let objKey in obj) {  //for...in...循环 对象
+        //     //key: border/ color/ background...
+        //     //node.style.border = ...
+        //     //node.style.color = ...
+        //     node.style[objKey] = obj[objKey]
+        // }
+        if(arguments.length === 3){
+            node.style[name] = value
+        }else if(arguments.length === 2) {
+            if (typeof name === "string") {
+                return node.style[name]
+            } else if (name instanceof Object) {
+                const object = name
+                for (let key in object) {
+                    node.style[key] = object[key]
+                }
+            }
         }
+    },
+    class:{ //class对象 existing.class.add(existing,className)
+        add(node,className){
+            node.classList.add(className)
+        },
+        remove(node,className) {
+            node.classList.remove(className)
+        },
+        has(node,className){
+            return node.classList.contains(className)
+        }
+    },
+    //事件
+    //添加监听事件
+    on(node,eventName,fn){ //fn事件处理函数
+        node.addEventListener(eventName,fn)
+    },
+    //移除监听事件
+    off(node,eventName,fn){
+        node.removeEventListener.off(node,)
+    },
+    find(selector,scope){ //在指定范围内查找 标签
+        return (scope || document).querySelectorAll(selector)
+    },
+    parent(node){
+        return node.parentNode
+    },
+    children(node){
+        return node.children
+    },
+    siblings(node) {
+        return Array.from(node.parentNode.children).filter((n) => n != node)
+    },
+    next(node){
+        let x = node.nextSibling  //node节点里面 有文本节点
+        while(x && x.nodeType === 3){
+            x = x.nextSibling
+        }
+        return x
+    },
+    previous(node) {
+        let x = node.previousSibling
+        while(x && x.nodeType === 3){  //x存在，且x不为文本节点
+            x = x.previousSibling
+        }
+        return x
+    },
+    each(nodeList,fn){  //用于遍历 所有节点 ,可以传入函数 操作
+        for(let i= 0;i< nodeList.length;i++){
+            fn.call(null,nodeList[i])
+        }
+    },
+    index(node){
+        const list = dom.children(node.parentNode)
+        let i
+        for(i= 0 ;i<list.length;i++){
+            if(list[i] === node){
+                break
+            }
+        }
+        return i
     }
 }
 /*
 * innerHTML是属性 不是方法
-* 什么是重载？ 根据参数数量 进行操作
-* 什么是适配？ 适配不同电压、浏览器
+* 什么是重载？ 根据参数数量 进行操作——别人给我我
+* 什么是适配？ 适配不同电压、浏览器——我要面对的
 * */
+
